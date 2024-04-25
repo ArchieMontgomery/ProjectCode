@@ -41,33 +41,3 @@ dropout_time_n = function(n_measure, n_indiv, miss.proportion)   {
   params_y = list(sim_params, y_long, y_wide)
   return(params_y)
 }
-vals_n_data = dropout_time_n(5, 100, 0.2)
-true_vals = vals_n_data[[1]]
-sample_d_long = vals_n_data[[2]]
-ggplot(sample_d_long, aes(time, Y)) +
-  geom_line(aes(col = factor(ID))) +
-  geom_point() +
-  theme(legend.position = "none")
-
-model.marginal.lmer = lmer(Y ~ time + (1|ID), data = sample_d_long)
-  model.marginal.lme = lme(fixed = Y ~ time, random = ~ 1|ID, 
-                           data = sample_d_long, subset = complete.cases(Y))
-  
-  # Design matrix
-  X = model.matrix(model.marginal.lmer)
-  colnames(X) = c("Intercept", "Time")
-  
-  # Regression coefficients
-  beta = summary(model.marginal.lmer)$coefficients[,1]
-  
-  # X Beta
-  X_beta = X%*%beta
-  
-  # lmer estimates
-  lmer_estimates = X_beta[1:3]
-  
-  # EE (lmer)
-  diff.lmer = abs(lmer_estimates - true_vals[1:3])
-  EE.lmer[i] = mean(diff.lmer[1:3])
-EE.lmer
-
